@@ -1,19 +1,21 @@
 #include <Arduino.h>
 
-int buttonState;
-int previousButtonState = HIGH;
 const int BUTTON = 8;
 const int GREENLED = 5;
 
 const int POTPIN = A0;
 const int REDLED = 4;
-int value;
 
 const int UNKNOWN = 0;      // State: Not pressed, released or hold
 const int PRESSED = 1;      // State: Button pressed
 const int RELEASED = 2;     // State: Button released
 const int PRESSED_HOLD = 3; // State: Button pressed and hold
-int state = UNKNOWN;
+const int RELEASED_HOLD = 4; 
+
+int state;
+int buttonState;
+int previousButtonState = HIGH;
+bool isPrinted = false;
 
 void setup()
 {
@@ -27,37 +29,62 @@ void setup()
 
 void loop()
 {
-  buttonState = digitalRead(BUTTON);
-  if(buttonState == LOW && previousButtonState == HIGH)
+   buttonState = digitalRead(BUTTON);
+   
+  if (buttonState == LOW && previousButtonState == HIGH)
   {
     state = PRESSED;
   }
-  else if(buttonState == HIGH && previousButtonState == LOW)
+  else if (buttonState == HIGH && previousButtonState == LOW)
   {
     state = RELEASED;
   }
-  else if(buttonState == LOW && previousButtonState == LOW)
+  else if (buttonState == LOW && previousButtonState == LOW)
   {
     state = PRESSED_HOLD;
+  }
+  else if (buttonState == HIGH && previousButtonState == HIGH)
+  {
+    state = RELEASED_HOLD;
   }
   else
   {
     state = UNKNOWN;
   }
-  previousButtonState = buttonState;
 
   // ... For you to add a ‘small’ button handler that sets the ‘state’ variable,
   // and complete the sequence state pattern below.
-  if (state == PRESSED)
-  {
-    Serial.println("PRESSED");
+  if (buttonState != previousButtonState)
+  {   
+    if (state == PRESSED)
+    {
+      Serial.println("PRESSED");
+    }
+    else if (state == RELEASED)
+    {
+      Serial.println("RELEASED");
+    }
+    previousButtonState = buttonState;
+    isPrinted = false;
   }
-  else if (state == RELEASED)
+  else
   {
-    Serial.println("RELEASED");
+    if (!isPrinted)
+    {       
+      if (state == PRESSED_HOLD)
+      {         
+        Serial.println("PRESSED_HOLD");
+      }
+      else if (state == RELEASED_HOLD)
+      {
+        Serial.println("RELEASED_HOLD");
+      }
+      else
+      {
+        Serial.println("UNKNOWN");
+      }
+      isPrinted = true;
+    }
   }
-  else if (state == PRESSED_HOLD)
-  {
-    Serial.println("PRESSED_HOLD");
-  }
+  delay(500);
 }
