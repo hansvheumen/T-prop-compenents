@@ -1,47 +1,39 @@
+/*
+ * Rich shield example
+ * Adapted from Rich Shield Example Code
+ * Fontys University of Applied Science
+ * Name: LightSensor
+ * Date: 07/01/2019
+ * Author: Jaap Geurts <jaap.geurts@fontys.nl>
+ * Version: 1.0
+ */
+
 #include <Arduino.h>
+#include <OpenRichShield.h>
 
-const int BUTTON = 8;
-const int GREENLED = 5;
-
-const int POTPIN = A0;
-const int REDLED = 4;
-
-const int UNKNOWN = 0;      // State: Not pressed, released or hold
-const int PRESSED = 1;      // State: Button pressed
-const int RELEASED = 2;     // State: Button released
-const int PRESSED_HOLD = 3; // State: Button pressed and hold
-const int RELEASED_HOLD = 4;
-
-int state;
-int value;
-int previousValue = -1000;
-int threashold = 3;
-int buttonState;
-int previousButtonState = HIGH;
-bool isPrinted = false;
+const int PIN_LDR = 16;
+int min = 1023, max = 0;
 
 void setup()
 {
-  pinMode(BUTTON, INPUT_PULLUP);
-  pinMode(GREENLED, OUTPUT);
-  pinMode(POTPIN, INPUT);
-  pinMode(REDLED, OUTPUT);
-
   Serial.begin(9600);
+  pinMode(PIN_LDR, INPUT);
 }
 
 void loop()
 {
-  value = analogRead(POTPIN);
-  digitalWrite(REDLED, HIGH);
-  delay(value);
-  digitalWrite(REDLED, LOW);
-  delay(value);
-
-  int quarter = map(value, 0, 1023, 1, 4);
-  if (abs(value - previousValue) > threashold)
-  {    
-    previousValue = value;
-    Serial.println(quarter);
+  int brightness = analogRead(PIN_LDR);
+  if (brightness < min)
+  {
+    min = brightness; // new minimal brightness (darkness)
   }
+  if (brightness > max)
+  {
+    max = brightness; // new maximal brightness (highlight)
+  }
+  Serial.print("dark = ");
+  Serial.println(min);
+  Serial.print("highlight = ");
+  Serial.println(max);
+  delay(5000);
 }
