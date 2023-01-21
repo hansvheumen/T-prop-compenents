@@ -14,6 +14,8 @@ const int RELEASED_HOLD = 4;
 
 int state;
 int value;
+int previousValue = -1000;
+int threashold = 3;
 int buttonState;
 int previousButtonState = HIGH;
 bool isPrinted = false;
@@ -36,6 +38,10 @@ void loop()
   digitalWrite(REDLED, LOW);
   delay(value);
 
-  int quarter = map(value, 0, 1023, 0, 3);
-  Serial.println(quarter + 1);
+  int quarter = map(value, 0, 1023, 1, 4);
+  if (abs(value - previousValue) > threashold)
+  {    
+    previousValue = value;
+    Serial.println(quarter);
+  }
 }
