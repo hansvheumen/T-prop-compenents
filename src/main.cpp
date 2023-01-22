@@ -11,29 +11,64 @@
 #include <Arduino.h>
 #include <OpenRichShield.h>
 
-const int PIN_LDR = 16;
-int min = 1023, max = 0;
+const int POTPIN = A0;
+const int THRESHOLD = 5;
+const int FULL_LEFT = 0;
+const int FULL_RIGHT = 100;
+const int HALF_WAY = 50;
+
+const int LED_RED = 4;
+const int LED_GREEN = 5;
+const int LED_BLUE = 6;
+const int LED_YELLOW = 7;
+
+int previousPercentage = -1;
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(PIN_LDR, INPUT);
+  display.off();
+
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+  pinMode(LED_YELLOW, OUTPUT);
+
+  pinMode(POTPIN, INPUT);
 }
 
 void loop()
 {
-  int brightness = analogRead(PIN_LDR);
-  if (brightness < min)
+  int value = analogRead(POTPIN);
+  int percentage = map(value, 0, 1023, 0, 100);
+
+  if (abs(percentage - previousPercentage) > 2)
   {
-    min = brightness; // new minimal brightness (darkness)
+
+    if (abs(FULL_LEFT - percentage) < THRESHOLD)
+    {
+      digitalWrite(LED_YELLOW, HIGH);
+    }
+    else
+    {
+      digitalWrite(LED_YELLOW, LOW);
+    }
+    if (abs(FULL_RIGHT - percentage) < THRESHOLD)
+    {
+      digitalWrite(LED_GREEN, HIGH);
+    }
+    else
+    {
+      digitalWrite(LED_GREEN, LOW);
+    }
+    if (abs(HALF_WAY - percentage) < THRESHOLD)
+    {
+      digitalWrite(LED_BLUE, HIGH);
+    }
+    else
+    {
+      digitalWrite(LED_BLUE, LOW);
+    }
+    previousPercentage = percentage;
   }
-  if (brightness > max)
-  {
-    max = brightness; // new maximal brightness (highlight)
-  }
-  Serial.print("dark = ");
-  Serial.println(min);
-  Serial.print("highlight = ");
-  Serial.println(max);
-  delay(5000);
 }
