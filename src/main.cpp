@@ -1,13 +1,3 @@
-/*
- * Rich shield example
- * Adapted from Rich Shield Example Code
- * Fontys University of Applied Science
- * Name: LightSensor
- * Date: 07/01/2019
- * Author: Jaap Geurts <jaap.geurts@fontys.nl>
- * Version: 1.0
- */
-
 #include <Arduino.h>
 #include <OpenRichShield.h>
 
@@ -22,53 +12,33 @@ const int LED_GREEN = 5;
 const int LED_BLUE = 6;
 const int LED_YELLOW = 7;
 
-int previousPercentage = -1;
+float previousHuminity = -1;
 
 void setup()
 {
   Serial.begin(9600);
-  display.off();
 
-  pinMode(LED_RED, OUTPUT);
-  pinMode(LED_GREEN, OUTPUT);
-  pinMode(LED_BLUE, OUTPUT);
-  pinMode(LED_YELLOW, OUTPUT);
-
-  pinMode(POTPIN, INPUT);
+  dht.begin();
 }
 
 void loop()
 {
-  int value = analogRead(POTPIN);
-  int percentage = map(value, 0, 1023, 0, 100);
 
-  if (abs(percentage - previousPercentage) > 2)
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  if (humidity != previousHuminity)
   {
-
-    if (abs(FULL_LEFT - percentage) < THRESHOLD)
-    {
-      digitalWrite(LED_YELLOW, HIGH);
-    }
-    else
-    {
-      digitalWrite(LED_YELLOW, LOW);
-    }
-    if (abs(FULL_RIGHT - percentage) < THRESHOLD)
-    {
-      digitalWrite(LED_GREEN, HIGH);
-    }
-    else
-    {
-      digitalWrite(LED_GREEN, LOW);
-    }
-    if (abs(HALF_WAY - percentage) < THRESHOLD)
-    {
-      digitalWrite(LED_BLUE, HIGH);
-    }
-    else
-    {
-      digitalWrite(LED_BLUE, LOW);
-    }
-    previousPercentage = percentage;
+    previousHuminity = humidity;
+    display.show(humidity);
+    Serial.println(humidity);
+    delay(1000);
+  }
+  else
+  {
+    display.show(-1);
+    delay(500);
+    display.clear();
+    delay(500);
   }
 }
