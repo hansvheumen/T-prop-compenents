@@ -13,10 +13,10 @@ const int LED_BLUE = 6;
 const int LED_YELLOW = 7;
 
 const int LEDPIN = 5;
-const int INTERVAL = 10000;
+const int INTERVAL = 1000;
 const int TEN_HZ = 10;
 const int HUNDRED_HZ = 100;
-bool frequenceIsSlow = true;
+int frequence = 1;
 unsigned long previousTime = 0;
 
 void setup()
@@ -40,15 +40,9 @@ void loop()
   if (current_time - previousTime >= INTERVAL)
   {
     previousTime = current_time;
-    frequenceIsSlow = !frequenceIsSlow;
+    frequence++;
+    Serial.println(frequence);
   }
 
-  if (frequenceIsSlow)
-  {
-    pinBlinkAtHz(LEDPIN, TEN_HZ);
-  }
-  else
-  {
-    pinBlinkAtHz(LEDPIN, HUNDRED_HZ);
-  }
+  pinBlinkAtHz(LEDPIN, frequence);
 }
