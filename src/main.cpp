@@ -12,33 +12,43 @@ const int LED_GREEN = 5;
 const int LED_BLUE = 6;
 const int LED_YELLOW = 7;
 
-float previousHuminity = -1;
+const int LEDPIN = 5;
+const int INTERVAL = 10000;
+const int TEN_HZ = 10;
+const int HUNDRED_HZ = 100;
+bool frequenceIsSlow = true;
+unsigned long previousTime = 0;
 
 void setup()
 {
   Serial.begin(9600);
+  pinMode(LEDPIN, OUTPUT);
+}
 
-  dht.begin();
+void pinBlinkAtHz(int pin, int hz)
+{
+  int delayTime = 1000 / hz;
+  digitalWrite(pin, HIGH);
+  delay(delayTime);
+  digitalWrite(pin, LOW);
+  delay(delayTime);
 }
 
 void loop()
 {
-
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
-
-  if (humidity != previousHuminity)
+  unsigned long current_time = millis();
+  if (current_time - previousTime >= INTERVAL)
   {
-    previousHuminity = humidity;
-    display.show(humidity);
-    Serial.println(humidity);
-    delay(1000);
+    previousTime = current_time;
+    frequenceIsSlow = !frequenceIsSlow;
+  }
+
+  if (frequenceIsSlow)
+  {
+    pinBlinkAtHz(LEDPIN, TEN_HZ);
   }
   else
   {
-    display.show(-1);
-    delay(500);
-    display.clear();
-    delay(500);
+    pinBlinkAtHz(LEDPIN, HUNDRED_HZ);
   }
 }
