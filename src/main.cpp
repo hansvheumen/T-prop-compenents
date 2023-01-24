@@ -13,11 +13,10 @@ const int LED_BLUE = 6;
 const int LED_YELLOW = 7;
 
 const int LEDPIN = 5;
-const int INTERVAL = 1000;
-const int TEN_HZ = 10;
-const int HUNDRED_HZ = 100;
-int frequence = 1;
-unsigned long previousTime = 0;
+bool isDimming = false;
+int percentage = 0;
+const int DIMMING_INTERVAL = 5000;
+const long BRIGHTENING_INTERVAL = 10000;
 
 void setup()
 {
@@ -25,24 +24,23 @@ void setup()
   pinMode(LEDPIN, OUTPUT);
 }
 
-void pinBlinkAtHz(int pin, int hz)
+void pinAtBrighness(int pin, int percentage)
 {
-  int delayTime = 1000 / hz;
-  digitalWrite(pin, HIGH);
-  delay(delayTime);
-  digitalWrite(pin, LOW);
-  delay(delayTime);
+  int brightness = map(percentage, 0, 100, 0, 255);
+  analogWrite(pin, brightness);
 }
 
 void loop()
 {
-  unsigned long current_time = millis();
-  if (current_time - previousTime >= INTERVAL)
+  long current_time = millis() % (BRIGHTENING_INTERVAL + DIMMING_INTERVAL);
+  isDimming = current_time > BRIGHTENING_INTERVAL;
+  if (isDimming)
   {
-    previousTime = current_time;
-    frequence++;
-    Serial.println(frequence);
+    percentage = 100 * (BRIGHTENING_INTERVAL + DIMMING_INTERVAL - current_time) / DIMMING_INTERVAL;
   }
-
-  pinBlinkAtHz(LEDPIN, frequence);
+  else
+  {
+    percentage = 100 * current_time / BRIGHTENING_INTERVAL;
+  }
+  pinAtBrighness(LEDPIN, percentage);
 }
