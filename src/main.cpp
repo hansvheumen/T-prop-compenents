@@ -12,35 +12,34 @@ const int LED_GREEN = 5;
 const int LED_BLUE = 6;
 const int LED_YELLOW = 7;
 
-const int LEDPIN = 5;
-bool isDimming = false;
-int percentage = 0;
-const int DIMMING_INTERVAL = 5000;
-const long BRIGHTENING_INTERVAL = 10000;
+const int PIN_RED = 7;
+const int PIN_GREEN = 6;
+const int PIN_BLUE = 5;
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(LEDPIN, OUTPUT);
+  pinMode(PIN_RED, OUTPUT);
+  pinMode(PIN_GREEN, OUTPUT);
+  pinMode(PIN_BLUE, OUTPUT);
 }
 
-void pinAtBrighness(int pin, int percentage)
+void setColor(int redValue, int greenValue, int blueValue)
 {
-  int brightness = map(percentage, 0, 100, 0, 255);
-  analogWrite(pin, brightness);
+  analogWrite(PIN_RED, redValue);
+  analogWrite(PIN_GREEN, greenValue);
+  analogWrite(PIN_BLUE, blueValue);
 }
-
 void loop()
 {
-  long current_time = millis() % (BRIGHTENING_INTERVAL + DIMMING_INTERVAL);
-  isDimming = current_time > BRIGHTENING_INTERVAL;
-  if (isDimming)
-  {
-    percentage = 100 * (BRIGHTENING_INTERVAL + DIMMING_INTERVAL - current_time) / DIMMING_INTERVAL;
-  }
-  else
-  {
-    percentage = 100 * current_time / BRIGHTENING_INTERVAL;
-  }
-  pinAtBrighness(LEDPIN, percentage);
+  setColor(255, 0, 0); // Red Color
+  delay(1000);
+  setColor(0, 255, 0); // Green Color
+  delay(1000);
+  setColor(0, 0, 255); // Blue Color
+  delay(1000);
+  setColor(255, 255, 255); // White Color
+  delay(1000);
+  setColor(170, 0, 255); // Purple Color
+  delay(1000);
 }
